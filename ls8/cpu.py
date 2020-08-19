@@ -11,26 +11,46 @@ class CPU:
         self.ram = [0] * 256
         self.pc = 0
 
-    def load(self):
+    def load(self, filename):
         """Load a program into memory."""
+        filename = sys.argv[1]
+        try:
+            address = 0
+            with open(filename) as file:
+                for line in file:
+                    split_line = line.split('#')[0]
+                    command = split_line.strip()
+                    if command == '':
+                        continue
 
-        address = 0
+                    instruction = int(command, 2)
+                    print(f'{instruction:8b} is {instruction}')
+                    self.ram[address] = instruction
+                    self.pc += 1
 
-        # For now, we've just hardcoded a program:
+        except FileNotFoundError:
+            print(f'{sys.argv[0]}: {sys.argv[1]} file not found.')
+            sys.exit()
 
-        program = [
-            # From print8.ls8
-            0b10000010, # LDI R0,8
-            0b00000000,
-            0b00001000,
-            0b01000111, # PRN R0
-            0b00000000,
-            0b00000001, # HLT
-        ]
+    if len(sys.argv) < 2:
+        print(f'please provide a second file to load with this program as such: python cpu.py [insert second file here]')
+        sys.exit()
 
-        for instruction in program:
-            self.ram[address] = instruction
-            address += 1
+        # # For now, we've just hardcoded a program:
+
+        # program = [
+        #     # From print8.ls8
+        #     0b10000010, # LDI R0,8
+        #     0b00000000,
+        #     0b00001000,
+        #     0b01000111, # PRN R0
+        #     0b00000000,
+        #     0b00000001, # HLT
+        # ]
+
+        # for instruction in program:
+        #     self.ram[address] = instruction
+        #     address += 1
 
 
     def alu(self, op, reg_a, reg_b):
@@ -75,10 +95,11 @@ class CPU:
         """Run the CPU."""
         HLT = 0b00000001 
         LDI = 0b10000010 
-        PRN = 0b01000111 
+        PRN = 0b01000111
+
         is_running = True
 
-        print(f'\n ({is_running}) Now running...')
+        print(f'\n ({is_running}) Now running...\n')
 
         while is_running:
             IR = self.ram[self.pc]
@@ -86,13 +107,14 @@ class CPU:
             operand_a = self.ram[self.pc + 1]
             operand_b = self.ram[self.pc + 2]
 
-        if IR == HLT:
-            running = False
-            self.pc += 1 
-        elif IR == LDI:
-            self.pc += 2 
-        elif IR == PRN:
-            self.pc += 2
-        else:
-            self.pc += 1 
-            
+            if IR == HLT:
+                print(f'\n Goodbye...')
+                is_running = False
+            elif IR == LDI:
+                self.ram_write(operand_a, operand_b)
+            elif IR == PRN:
+                print(self.ram_read(self.ram[self.pc+1]))
+                self.pc += 2
+            else:
+                self.pc += 1 
+                
