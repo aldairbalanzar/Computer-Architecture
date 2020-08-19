@@ -20,13 +20,11 @@ class CPU:
                 for line in file:
                     split_line = line.split('#')[0]
                     command = split_line.strip()
-                    if command == '':
-                        continue
-
-                    instruction = int(command, 2)
-                    print(f'{instruction:8b} is {instruction}')
-                    self.ram[address] = instruction
-                    self.pc += 1
+                    if command:
+                        instruction = int(command, 2)
+                        # print(f'{instruction:8b} is {instruction}')
+                        self.ram[address] = instruction
+                        address += 1
 
         except FileNotFoundError:
             print(f'{sys.argv[0]}: {sys.argv[1]} file not found.')
