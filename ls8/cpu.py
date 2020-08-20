@@ -10,6 +10,7 @@ class CPU:
         self.reg = [0] * 8
         self.ram = [0] * 256
         self.pc = 0
+        self.reg[7] = 0b11110100
 
     def load(self, filename):
         """Load a program into memory."""
@@ -96,21 +97,36 @@ class CPU:
             if IR == HLT:
                 print(f'\n Goodbye...')
                 is_running = False
+
             elif IR == LDI:
                 self.ram_write(operand_a, operand_b)
                 self.pc += 3
+
             elif IR == PRN:
                 print(self.ram_read(self.ram[self.pc+1]))
                 self.pc += 2
+                
             elif IR == MUL:
                 print('MULTIPLY')
                 product = operand_a * operand_b
                 self.reg[operand_a] = product
                 self.pc += 3
-            elif IR == POP:
-                pass
+
             elif IR == PSH:
-                pass
+                print('bouta\' push')
+                self.reg[7] -= 1
+                value = self.ram[self.reg[7]]
+                self.ram[self.reg[7]] = value
+                print(f'pushed: {value}')
+                self.pc += 2
+
+            elif IR == POP:
+                print('bouta\' pop')
+                self.reg[7] += 1
+                value = self.ram[self.reg[7]]
+                print(f'popped: {value}')
+                self.pc += 2
+
             else:
                 self.pc += 1 
 
