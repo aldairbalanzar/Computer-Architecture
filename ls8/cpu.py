@@ -7,6 +7,7 @@ class CPU:
 
     def __init__(self):
         """Construct a new CPU."""
+        self.is_running = False
         self.reg = [0] * 8
         self.ram = [0] * 256
         self.pc = 0
@@ -83,20 +84,21 @@ class CPU:
         POP = 0b01000110
         PSH = 0b01000101
 
-        is_running = True
+        self.is_running = True
 
-        print(f'\n ({is_running}) Now running...\n')
+        print(f'\n ({self.is_running}) Now running...\n')
 
-        while is_running:
+        while self.is_running:
+
             IR = self.ram[self.pc]
-            print(f'IR: {IR}')
+            # print(f'IR: {IR}')
 
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
 
             if IR == HLT:
                 print(f'\n Goodbye...')
-                is_running = False
+                self.is_running = False
 
             elif IR == LDI:
                 self.ram_write(operand_a, operand_b)
@@ -105,7 +107,7 @@ class CPU:
             elif IR == PRN:
                 print(self.ram_read(self.ram[self.pc+1]))
                 self.pc += 2
-                
+
             elif IR == MUL:
                 print('MULTIPLY')
                 product = operand_a * operand_b
@@ -113,18 +115,18 @@ class CPU:
                 self.pc += 3
 
             elif IR == PSH:
-                print('bouta\' push')
+                print('<<bouta\' push>>')
                 self.reg[7] -= 1
                 value = self.ram[self.reg[7]]
                 self.ram[self.reg[7]] = value
-                print(f'pushed: {value}')
+                # print(f'   pushed: {value}')
                 self.pc += 2
 
             elif IR == POP:
-                print('bouta\' pop')
+                print('<<bouta\' pop>>')
                 self.reg[7] += 1
                 value = self.ram[self.reg[7]]
-                print(f'popped: {value}')
+                # print(f'   popped: {value}')
                 self.pc += 2
 
             else:
