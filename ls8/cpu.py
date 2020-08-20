@@ -12,6 +12,7 @@ class CPU:
         self.ram = [0] * 256
         self.pc = 0
         self.reg[7] = 0b11110100
+        self.sp = 7
 
     def load(self, filename):
         """Load a program into memory."""
@@ -92,7 +93,6 @@ class CPU:
 
             IR = self.ram[self.pc]
             # print(f'IR: {IR}')
-
             operand_a = self.ram_read(self.pc + 1)
             operand_b = self.ram_read(self.pc + 2)
 
@@ -116,17 +116,21 @@ class CPU:
 
             elif IR == PSH:
                 print('<<bouta\' push>>')
-                self.reg[7] -= 1
+                self.reg[operand_a]
                 value = self.ram[self.reg[7]]
-                self.ram[self.reg[7]] = value
-                # print(f'   pushed: {value}')
+                self.ram[self.sp] = value
+                print(f'   pushed: {value}')
+
+                self.sp -= 1
                 self.pc += 2
 
             elif IR == POP:
                 print('<<bouta\' pop>>')
-                self.reg[7] += 1
-                value = self.ram[self.reg[7]]
-                # print(f'   popped: {value}')
+                self.reg[operand_a]
+                value = self.ram[self.sp]
+                print(f'   popped: {value}')
+
+                self.sp += 1
                 self.pc += 2
 
             else:
